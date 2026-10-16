@@ -157,7 +157,7 @@ class Inventario(models.Model):
 
 class Proveedor(models.Model):
     rut = models.CharField(max_length=12, unique=True)
-    razon_social = models.CharField(max_length=100)
+
     contacto = models.CharField(max_length=100, blank=True, null=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
 

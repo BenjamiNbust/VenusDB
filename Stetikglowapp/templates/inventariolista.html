@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario - Centro Estético Antonia</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+
+
+ <div class="navbar-antonia d-flex justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+
+        <img src="{% static 'img/logoAntonia.jpeg' %}" alt="Logo Antonia" style="height: 40px; object-fit: contain;">
+        <a href="#" class="brand-title text-decoration-none">Centro Estético Antonia</a>
+    </div>
+    <div class="d-flex align-items-center gap-4">
+        <a href="#" class="nav-link-antonia">Dashboard</a>
+        <a href="#" class="nav-link-antonia">Reservas</a>
+        <a href="#" class="nav-link-antonia">Clientes</a>
+        <a href="#" class="nav-link-antonia">Cierre de Caja</a>
+        <a href="#" class="nav-link-antonia active fw-bold">Inventario</a>
+        <a href="#" class="nav-link-antonia">Personal</a>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-light text-dark border">Admin</span>
+    </div>
+</div>
+
+    <div class="container my-4">
+        <div class="main-container">
+            
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="fw-bold text-uppercase fs-4" style="color: #4a2e35; letter-spacing: 0.5px;">Inventario</h3>
+                <a href="{% url 'inventario_create' %}" class="btn-pink-antonia">+ Añadir Nuevo producto</a>
+            </div>
+
+
+            <div class="d-flex border-bottom mb-4 pb-2">
+                <a href="#" class="tab-antonia active">Productos</a>
+                <a href="#" class="tab-antonia">Insumos</a>
+                <a href="#" class="tab-antonia">Plan de Inventario</a>
+            </div>
+
+
+            <div class="mb-4 bg-light p-3 rounded border">
+                <label class="form-label fw-bold small text-secondary">SELECCIONE LOCAL / SUCURSAL:</label>
+                <div class="d-flex flex-wrap gap-2 mt-1">
+                    {% for sucursal in sucursales %}
+                        <a href="{% url 'inventario_list_sucursal' sucursal.id %}" 
+                           class="btn btn-sm {% if sucursal_actual and sucursal_actual.id == sucursal.id %}btn-sucursal-activo{% else %}btn-sucursal-inactivo{% endif %}">
+                            {{ sucursal.nombre }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+
+            <div class="row g-2 mb-4 bg-white p-3 border rounded shadow-sm align-items-center">
+                <div class="col-md-3">
+                    <input type="text" class="form-control form-control-sm" placeholder="🔍 Buscar producto...">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm">
+                        <option selected>Categoría</option>
+                        <option>Facial</option>
+                        <option>Corporal</option>
+                        <option>Capilar</option>
+                        <option>Insumos</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select form-select-sm">
+                        <option selected>Local</option>
+                        {% for sucursal in sucursales %}
+                            <option>{{ sucursal.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select form-select-sm">
+                        <option selected>Seleccionar Área de Servicio</option>
+                        <option>Manicure / Depilación</option>
+                        <option>Tratamientos Faciales</option>
+                    </select>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button class="btn btn-outline-secondary btn-sm w-100">Limpiar Filtros</button>
+                </div>
+            </div>
+
+
+            {% if sucursal_actual %}
+                <div class="mb-2 text-secondary fw-semibold">
+                    Mostrando inventario de: <span class="text-dark fw-bold">{{ sucursal_actual.nombre }}</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-antonia align-middle border">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox"></th>
+                                <th>ID Producto</th>
+                                <th>Descripción producto</th>
+                                <th>Categoría</th>
+                                <th>Precio por unidad</th>
+                                <th>Stock Actual</th>
+                                <th>Stock Mínimo</th>
+                                <th>Última Actualización</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventarios %}
+                            <tr>
+                                <td><input type="checkbox"></td>
+                                <td class="fw-bold">00{{ item.id }}</td>
+                                <td>
+                                    <div class="fw-bold">{{ item.producto.nombre }}</div>
+                                    <small class="text-muted">{{ item.producto.descripcion|default:"Insumo para servicio estético"|truncatechars:35 }}</small>
+                                </td>
+                                <td><span class="badge bg-light text-dark border">{{ item.producto.categoria|default:"General" }}</span></td>
+                                <td>${{ item.producto.precio_venta }}</td>
+                                <td>
+                                    <span class="fw-bold {% if item.cantidad <= item.producto.stock_minimo %}text-danger{% else %}text-success{% endif %}">
+                                        {{ item.cantidad }} uds
+                                    </span>
+                                </td>
+                                <td>{{ item.producto.stock_minimo }}</td>
+                                <td>{{ item.ultima_actualizacion|date:"d/m/Y H:i" }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'inventario_update' item.id %}" class="btn-editar-antonia d-inline-block text-decoration-none">Editar</a>
+                                    <a href="{% url 'inventario_delete' item.id %}" class="btn-eliminar-antonia d-inline-block text-decoration-none">Eliminar</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted py-5">
+                                    No hay insumos ni productos registrados en este local.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-warning" role="alert">
+                    No hay sucursales disponibles en el sistema.
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="{% static 'JS/funciones.js' %}"></script>
+</body>
+</html>
