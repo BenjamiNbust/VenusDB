@@ -1,7 +1,7 @@
 """
 URL configuration for Stetikglowapp project.
 
-The `urlpatterns` list routes URLs to views. For more information please see:
+The `urlpatterns` list routes URLs to  For more information please see:
     https://docs.djangoproject.com/en/6.0/topics/http/urls/
 Examples:
 Function views
@@ -21,6 +21,8 @@ from funciones_app.views import *
 urlpatterns = [
     path('', InventarioList, name='inventario_list'),
     path('sucursal/<int:sucursal_id>/', InventarioList, name='inventario_list_sucursal'),
+    path('plan/', PlanInventarioView, name='plan_inventario'),
+    path('plan/nuevo/', PlanInventarioCreate, name='plan_inventario_create'), # <-- Nueva ruta
     path('nuevo/', InventarioCreate, name='inventario_create'),
     path('editar/<int:pk>/', InventarioUpdate, name='inventario_update'),
     path('eliminar/<int:pk>/', InventarioDelete, name='inventario_delete'),

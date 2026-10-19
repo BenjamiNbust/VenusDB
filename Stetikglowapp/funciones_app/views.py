@@ -49,3 +49,16 @@ def InventarioDelete(request, pk):
         inventario.delete()
         return redirect('inventario_list_sucursal', sucursal_id=sucursal_id)
     return render(request, 'inventarioDelete.html', {'inventario': inventario})
+
+def PlanInventarioView(request):
+    sucursales = Sucursal.objects.all()
+    context = {
+        'sucursales': sucursales,
+    }
+    return render(request, 'planinventario.html', context)
+
+def PlanInventarioCreate(request):
+    sucursales = Sucursal.objects.all()
+    if request.method == 'POST':
+        return redirect('plan_inventario')
+    return render(request, 'planinventarioform.html', {'sucursales': sucursales, 'titulo': 'Crear Nuevo Plan de Inventario'})
